@@ -9,6 +9,7 @@ javascript: (function () {
 	const processedTitle = new WeakSet();
 	const processedMostPlayed = new WeakSet();
 	const processedOtherGames = new WeakSet();
+	const processedButtons = new WeakSet();
 
 	function updateTitle() {
 		const element = document.querySelector(".AmQ9dRhZqhOyU0Vgt3nWR");
@@ -37,7 +38,7 @@ javascript: (function () {
 			if (processedOtherGames.has(e)) return;
 			processedOtherGames.add(e);
 
-			let appID = getAppID(e, "._3yp7l6ya6Tr2G_hZK0yrXz");
+			let appID = getAppID(e, "._1OZ4wvkQU53fcikZxtoS3u", true);
 			addHoursPlayed(e, "._3nXdDUZyLDuZxhkbe3WpO8", appID);
 		});
 	}
@@ -72,7 +73,8 @@ javascript: (function () {
 		mainDiv.append(statDiv);
 	}
 
-	function getAppID(el, classname) {
+	function getAppID(el, classname, link = false) {
+		if (link) return el.querySelector(classname).childNodes[1].href.split("/").pop();
 		return el.querySelector(classname).style.backgroundImage.split("apps/").pop().split("/")[0];
 	}
 
@@ -93,7 +95,30 @@ javascript: (function () {
 		observer.observe(document.body, { childList: true, subtree: true });
 	}
 
+	function updateOnButtonClick() {
+		document.querySelectorAll("._1tCO1rmBfntUI0TlpTly1F").forEach((button) => {
+			if (processedButtons.has(button)) return;
+			processedButtons.add(button);
+
+			button.addEventListener("click", (event) => {
+				requestAnimationFrame(() => {
+					let appID = getAppID(
+						button.closest("._3C4RVE-PZ18y1tGp7HLpP9"),
+						"._1OZ4wvkQU53fcikZxtoS3u",
+						true
+					);
+					addHoursPlayed(
+						button.closest("._3C4RVE-PZ18y1tGp7HLpP9"),
+						"._3nXdDUZyLDuZxhkbe3WpO8",
+						appID
+					);
+				});
+			});
+		});
+	}
+
 	observeElements(updateTitle);
 	observeElements(updateMostPlayed);
 	observeElements(updateOtherGames);
+	observeElements(updateOnButtonClick);
 })();
