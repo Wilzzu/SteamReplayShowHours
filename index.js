@@ -1,5 +1,5 @@
 javascript: (function () {
-	const year = window.location.href.split("/").pop();
+	const year = window.location.href.split("/").pop().slice(0, 4);
 	let data = JSON.parse(
 		application_config.dataset[
 			`yearinreview_${JSON.parse(application_config.dataset.userinfo).accountid}_${year}`
@@ -46,10 +46,29 @@ javascript: (function () {
 		if (id.includes("url")) return;
 		let mainDiv = el.querySelector(classname);
 		let statDiv = mainDiv.childNodes[0].cloneNode(true);
-		statDiv.childNodes[0].innerHTML = Math.round(
-			data.games.find((game) => game.appid == id).stats.total_playtime_seconds / 3600
-		);
+		if (mainDiv.querySelector(".SRTHstats")) mainDiv.querySelector(".SRTHstats").remove();
+
+		let hours = "?";
+		if (data.games.find((game) => game.appid == id)) {
+			hours = Math.round(
+				data.games.find((game) => game.appid == id).stats.total_playtime_seconds / 3600
+			);
+		} else if (data.game_summary.find((game) => game.appid == id)) {
+			hours = Math.round(
+				(data.total_stats.total_playtime_seconds *
+					(data.game_summary.find((game) => game.appid == id).total_playtime_percentagex100 /
+						100 /
+						100)) /
+					60 /
+					60
+			);
+
+			if (hours < 1) hours = "<1";
+		}
+
+		statDiv.childNodes[0].innerHTML = hours;
 		statDiv.childNodes[1].innerHTML = "Hours Played";
+		statDiv.classList.add("SRTHstats");
 		mainDiv.append(statDiv);
 	}
 
