@@ -1,6 +1,6 @@
 # SteamReplayShowHours
 
-A script that shows how many hours you played this year in Steam Replay
+A script that shows your total and game-specific hours in Steam Replay
 
 ## How to use:
 
